@@ -1,0 +1,316 @@
+package main.Java;
+
+import java.util.*;
+
+
+public class AlgorithmTwo implements AlgorithmInterface {
+    int x;
+    int m;
+    int wordPos;
+    String [] wordList;
+    boolean listFound;
+    char [][] puzzle;
+//    private Grid grid;
+    private String[] words;
+    private Map<String,AlgorithmTwo.Coord> solutions = new HashMap<String, AlgorithmTwo.Coord>();
+
+
+    public AlgorithmTwo(String[] listOfWords, char[][] puzzle){
+//        this.grid = new Grid(puzzle);
+        this.words = listOfWords;
+        this.puzzle = puzzle;
+        x = puzzle[0].length;
+
+    }
+    public AlgorithmTwo(){  }
+
+    /*
+     * This method should initiate the word search solver given a list of words and the puzzle board.
+     * When the word search solver has completed, it will return a ResultsEngine object to MainController
+     */
+    public ResultsEngine init(String[] listOfWords, char[][] puzzle){
+        m = listOfWords.length;
+        x = puzzle[0].length;
+        wordList = listOfWords;
+        listFound = false;
+        wordPos = 0;
+
+
+        //should return getData();
+        return null;
+    }
+
+
+        /**
+         * Method which searches for each word in the grid.
+         */
+        public void solve()
+        {
+            for (String word : words)
+                findWord(word);
+        }
+
+        /**
+         * Method which searches the given word in the grid with characters, by
+         * going by each character in the grid and look if it matches the first
+         * letter. If that is the case, the method continues to expand in
+         * each direction.
+         * @param word The word
+         */
+        private void findWord(String word)
+        {
+            char startingPosition = word.charAt(0);
+
+            for (int row = 0; row < this.x; row++)
+            {
+                for (int column = 0; column < this.x; column++)
+                {
+                    if (getCharacter(column, row) == startingPosition)
+                    {
+
+                        if (this.checkHorizontally(column, row, word))
+                            solutions.put(word, this.new Coord(column, row, (column + word.length() - 1), row));
+                        else if (this.checkVertically(column, row, word))
+                            solutions.put(word, this.new Coord(column, row, column, (row + word.length() - 1)));
+                        else if (this.checkVerticallyUp(column, row, word))
+                            solutions.put(word, this.new Coord(column, row, column, (row - word.length() + 1)));
+                        else if (this.checkDiagonallyDown(column, row, word))
+                            solutions.put(word, this.new Coord(column, row, (column + word.length() - 1), (row + word.length() - 1)));
+                        else if (this.checkDiagonallyUp(column, row, word))
+                            solutions.put(word, this.new Coord(column, row, (column + word.length() - 1), (row - word.length() + 1)));
+                    }
+                }
+            }
+        }
+
+    /**
+     * Gives the character getCharacter the given position.
+     * @param columnNumber The column
+     * @param rowNumber The row
+     * @return character
+     */
+    public char getCharacter(int columnNumber, int rowNumber)
+    {
+        if (columnNumber >= 0 && columnNumber < this.x && rowNumber >= 0 && rowNumber < this.x)
+            return puzzle[rowNumber][columnNumber];
+
+        return Character.UNASSIGNED;
+    }
+
+        /**
+         * Expands to the left if the word is in that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkLeft(int x, int y, String word)
+        {
+            if ((x + 1) - word.length() < 0)
+                return false;
+
+            int index = x;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(index, y) != letter)
+                    return false;
+                index--;
+            }
+
+            return true;
+        }
+
+        /**
+         * Expands to the right if the word is in that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkHorizontally(int x, int y, String word)
+        {
+            if (x + word.length() > this.x)
+                return false;
+
+            int index = x;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(index, y) != letter)
+                    return false;
+                index++;
+            }
+
+            return true;
+        }
+
+        /**
+         * Expands downwards if the word is in that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkVertically(int x, int y, String word)
+        {
+            if (y + word.length() > this.x)
+                return false;
+
+            int index = y;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(x, index) != letter)
+                    return false;
+                index++;
+            }
+
+            return true;
+        }
+
+        /**
+         * Expands upwards if the word is in that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkVerticallyUp(int x, int y, String word)
+        {
+            if ((y + 1) - word.length() < 0)
+                return false;
+
+            int index = y;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(x, index) != letter)
+                    return false;
+                index--;
+            }
+
+            return true;
+        }
+
+
+        /**
+         * Expands to the diagonal to right-downwards (\) if the word is in
+         * that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkDiagonallyDown(int x, int y, String word)
+        {
+            if (y + word.length() > this.x || x + word.length() > this.x)
+                return false;
+
+            int indexX = x, indexY = y;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(indexX, indexY) != letter)
+                    return false;
+                indexX++;
+                indexY++;
+            }
+
+            return true;
+        }
+
+
+        /**
+         * Expands to the diagonal to right-upwards (/) if the word is in
+         * that direction.
+         * @param x The column
+         * @param y The row
+         * @param word The word
+         * @return boolean
+         */
+        private boolean checkDiagonallyUp(int x, int y, String word)
+        {
+            if ((y + 1) - word.length() < 0 || x + word.length() > this.x)
+                return false;
+
+            int indexX = x, indexY = y;
+            for (char letter : word.toCharArray())
+            {
+                if (getCharacter(indexX, indexY) != letter)
+                    return false;
+                indexX++;
+                indexY--;
+            }
+
+            return true;
+        }
+
+        /**
+         * A basic toString function to show the grid and the words along with
+         * their start- and end-coordinates on the screen.
+         * @return String
+         */
+        @Override
+        public String toString()
+        {
+            StringBuilder output = new StringBuilder();
+            output.append("Words: ");
+
+            for (String word : words)
+                output.append(word).append(" ");
+
+            output.append("\n\n");
+
+            for (int y = 0; y < this.x; y++)
+            {
+                for (int x = 0; x < this.x; x++)
+                    output.append(getCharacter(x, y)).append(" ");
+                output.append("\n");
+            }
+
+            Set set = solutions.entrySet();
+            Iterator it = set.iterator();
+
+            while (it.hasNext())
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                Coord coord = (Coord) entry.getValue();
+                output.append(entry.getKey()).append(": ").append(coord.toString());
+                output.append("\n");
+            }
+
+            return output.toString();
+        }
+
+        /**
+         * Class for the coordinates of the begin and end position of a word.
+         */
+        public class Coord
+        {
+            public int startX, startY, endX, endY;
+            public Coord(int startX, int startY, int endX, int endY)
+            {
+                this.startX = startX;
+                this.startY = startY;
+                this.endX = endX;
+                this.endY = endY;
+            }
+
+            /**
+             * Basic toString method to show the coordinates on screen.
+             * @return String
+             */
+            @Override
+            public String toString()
+            {
+                StringBuilder string = new StringBuilder();
+
+                string.append(startX).append("x").append(startY).append(" to ");
+                string.append(endX).append("x").append(endY);
+
+                return string.toString();
+            }
+        }
+    @Override
+    public ResultsEngine getData() {
+        return null;
+    }
+
+}
